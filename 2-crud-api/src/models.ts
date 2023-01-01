@@ -9,14 +9,14 @@ export type UserDTO = {
   id: string;
   login: string;
   password: string;
-  age: string;
+  age: number;
   isDeleted: boolean;
 }
 
 export type NewUserDTO = {
   login: string;
   password: string;
-  age: string;
+  age: number;
 }
 
 const validator = createValidator();
@@ -38,8 +38,15 @@ export const patchUserSchema = validator.body(
   })
 );
 
+export const autoSuggestSchema = validator.query(
+  Joi.object({
+    loginSubstring: Joi.string().required(),
+    limit: Joi.number().integer().required(),
+  })
+);
+
 export interface AddUserSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Query]: {
+  [ContainerTypes.Body]: {
     login: string;
     password: string;
     age: number;
@@ -47,10 +54,17 @@ export interface AddUserSchema extends ValidatedRequestSchema {
 }
 
 export interface PatchUserSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Query]: {
+  [ContainerTypes.Body]: {
     id: string;
     login: string;
     password: string;
     age: number;
+  }
+}
+
+export interface AutoSuggestSchema extends ValidatedRequestSchema {
+  [ContainerTypes.Query]: {
+    loginSubstring: string;
+    limit: number;
   }
 }

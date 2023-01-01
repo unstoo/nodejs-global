@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
-import { UserDTO, NewUserDTO, addUserSchema, AddUserSchema, patchUserSchema, PatchUserSchema } from './models';
+import { UserDTO, NewUserDTO, addUserSchema, AddUserSchema, patchUserSchema, PatchUserSchema, autoSuggestSchema, AutoSuggestSchema } from './models';
 import { users } from './data';
 import { ValidatedRequest } from 'express-joi-validation'
 
@@ -35,7 +35,7 @@ app.post('/addUser', addUserSchema, (req: ValidatedRequest<AddUserSchema>, res: 
 });
 
 app.patch('/patchUser', patchUserSchema, (req: ValidatedRequest<PatchUserSchema>, res: Response) => {
-  const { id, login, password, age } = req.body as UserDTO
+  const { id, login, password, age } = req.body
   const user = users[id];
   if (!user || user.isDeleted) {
     return res.json(false);
@@ -58,20 +58,20 @@ app.delete('/deleteUser', (req: Request, res: Response) => {
   res.json(true);
 });
 
-app.get('/autoSuggest', (req: Request, res: Response) => {
+app.get('/autoSuggest', autoSuggestSchema, (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
   const { loginSubstring, limit } = req.query;
-  const stringParsed = String(loginSubstring).trim();
-  const limitParsed = Number(limit);
+  // const stringParsed = String(loginSubstring).trim();
+  // const limitParsed = Number(limit);
 
-  if (stringParsed === '' || !Number.isSafeInteger(limitParsed) || limitParsed < 1) {
-    return res.json([]);
-  }
+  // if (stringParsed === '' || !Number.isSafeInteger(limitParsed) || limitParsed < 1) {
+  //   return res.json([]);
+  // }
 
   const result = Object
     .values(users)
-    .filter(user => user.login.includes(stringParsed) && !user.isDeleted)
+    .filter(user => user.login.includes(loginSubstring) && !user.isDeleted)
     .sort((a, b) => a.login.localeCompare(b.login))
-    .slice(0, limitParsed);
+    .slice(0, limit);
 
   res.json(result);
 });
