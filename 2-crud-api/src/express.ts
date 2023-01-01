@@ -1,33 +1,11 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
-import { UserDTO, NewUserDTO } from './models';
+import { UserDTO, NewUserDTO, addUserSchema, AddUserSchema, patchUserSchema, PatchUserSchema } from './models';
+import { users } from './data';
+import { ValidatedRequest } from 'express-joi-validation'
 
 dotenv.config();
-
-const users: Record<string, UserDTO> = {
-  ['test_uuid']: {
-    id: 'test_uuid',
-    login: 'admin',
-    password: '42',
-    age: '112',
-    isDeleted: false,
-  },
-  ['test_uuid2']: {
-    id: 'test_uuid2',
-    login: 'usera',
-    password: '42',
-    age: '112',
-    isDeleted: false,
-  },
-  ['test_uuid3']: {
-    id: 'test_uuid3',
-    login: 'userb',
-    password: '42',
-    age: '112',
-    isDeleted: true,
-  },
-};
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -41,7 +19,8 @@ app.get('/', (req: Request, res: Response) => {
   res.json(data);
 });
 
-app.post('/addUser', (req: Request, res: Response) => {
+app.post('/addUser', addUserSchema, (req: ValidatedRequest<AddUserSchema>, res: Response
+  ) => {
   const { login, password, age } = req.body as NewUserDTO
   const id = uuidv4();
   users[id] = {
@@ -55,16 +34,16 @@ app.post('/addUser', (req: Request, res: Response) => {
   res.json(id);
 });
 
-app.patch('/patchUser', (req: Request, res: Response) => {
+app.patch('/patchUser', patchUserSchema, (req: ValidatedRequest<PatchUserSchema>, res: Response) => {
   const { id, login, password, age } = req.body as UserDTO
   const user = users[id];
   if (!user || user.isDeleted) {
     return res.json(false);
   }
 
-  if (login) user.login = login;
-  if (password) user.password = password;
-  if (age) user.age = age;
+  user.login = login;
+  user.password = password;
+  user.age = age;
   res.json(true);
 });
 
