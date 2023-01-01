@@ -60,12 +60,6 @@ app.delete('/deleteUser', (req: Request, res: Response) => {
 
 app.get('/autoSuggest', autoSuggestSchema, (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
   const { loginSubstring, limit } = req.query;
-  // const stringParsed = String(loginSubstring).trim();
-  // const limitParsed = Number(limit);
-
-  // if (stringParsed === '' || !Number.isSafeInteger(limitParsed) || limitParsed < 1) {
-  //   return res.json([]);
-  // }
 
   const result = Object
     .values(users)
