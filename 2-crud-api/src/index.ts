@@ -1,12 +1,14 @@
-import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { v4 as uuidv4 } from 'uuid';
-import { NewUserDTO, addUserSchema, AddUserSchema, patchUserSchema, PatchUserSchema, autoSuggestSchema, AutoSuggestSchema } from './models';
-import { users } from './data';
+import express, { Express, Request, Response } from 'express';
+import { addUserSchema, AddUserSchema, patchUserSchema, PatchUserSchema, autoSuggestSchema, AutoSuggestSchema } from './models';
 import { ValidatedRequest } from 'express-joi-validation';
 import {
   StatusCodes,
 } from 'http-status-codes';
+
+import UserService from './services/user';
+
+const userService = new UserService();
 
 dotenv.config();
 
@@ -15,62 +17,69 @@ const port = process.env.PORT;
 
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-  const { id } = req.query;
-  const user = users[id as string];
-  const data = (!user || user.isDeleted) ?? user;
+const Controller = {
+  getUser: {
+    route: '/',
+    service: userService.get
+  },
+  addUser: {
+    route: '/addUser',
+    service: userService.add
+  },
+  patchUser: {
+    route: '/patchUser',
+    service: userService.patch
+  },
+  deleteUser: {
+    route: '/deleteUser',
+    service: userService.delete
+  },
+  getUsersList: {
+    route: '/autoSuggest',
+    service: userService.find,
+  },
+};
+
+app.get(Controller.getUser.route, async (req: Request, res: Response) => {
+  const { data, error } = await Controller.getUser.service(req.query);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+  }
   res.status(StatusCodes.OK).json(data);
 });
 
-app.post('/addUser', addUserSchema, (req: ValidatedRequest<AddUserSchema>, res: Response
+app.post(Controller.addUser.route, addUserSchema, async (req: ValidatedRequest<AddUserSchema>, res: Response
   ) => {
-  const { login, password, age } = req.body as NewUserDTO
-  const id = uuidv4();
-  users[id] = {
-    id,
-    login,
-    password,
-    age,
-    isDeleted: false,
-  };
-
-  res.status(StatusCodes.OK).json(id);
-});
-
-app.patch('/patchUser', patchUserSchema, (req: ValidatedRequest<PatchUserSchema>, res: Response) => {
-  const { id, login, password, age } = req.body
-  const user = users[id];
-  if (!user || user.isDeleted) {
-    return res.status(StatusCodes.BAD_REQUEST).json(false);
+  const { data, error } = await Controller.addUser.service(req.body);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
   }
-
-  user.login = login;
-  user.password = password;
-  user.age = age;
-  res.status(StatusCodes.OK).json(true);
+  res.status(StatusCodes.OK).json(data);
 });
 
-app.delete('/deleteUser', (req: Request, res: Response) => {
-  const { id } = req.body;
-  const user = users[id as string];
-  if (!user || user.isDeleted) {
-    return res.status(StatusCodes.BAD_REQUEST).json(false);
+app.patch(Controller.patchUser.route, patchUserSchema, async (req: ValidatedRequest<PatchUserSchema>, res: Response) => {
+  const { data, error } = await Controller.patchUser.service(req.body);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
   }
-
-  user.isDeleted = true;
-  res.status(StatusCodes.OK).json(true);
+  res.status(StatusCodes.OK).json(data);
 });
 
-app.get('/autoSuggest', autoSuggestSchema, (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
-  const { loginSubstring, limit } = req.query;
+app.delete(Controller.deleteUser.route, async (req: Request, res: Response) => {
+  const { data, error } = await Controller.deleteUser.service(req.body);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+  res.status(StatusCodes.OK).json(data);
+});
 
-  const result = Object
-    .values(users)
-    .filter(user => user.login.includes(loginSubstring) && !user.isDeleted)
-    .sort((a, b) => a.login.localeCompare(b.login))
-    .slice(0, limit);
-
-  res.status(StatusCodes.OK).json(result);
+app.get(Controller.getUsersList.route, autoSuggestSchema, async (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
+  const { loginSubstring, limit } = req.body;
+  const { data, error } = await Controller.getUsersList.service(loginSubstring, limit);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+  res.status(StatusCodes.OK).json(data);
 });
 
 app.listen(port, () => {
