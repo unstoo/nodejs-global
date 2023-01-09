@@ -23,7 +23,7 @@ export default class UserService {
   async patch(user: Omit<UserDTO, 'isDeleted'> ) {
     return result(null, user);
   }
-  async find(loginSubstring: string, limit: number) {
+  async find({ loginSubstring, limit }) {
     const users = {};
     const filtered = Object
       .values(users)

@@ -74,8 +74,7 @@ app.delete(Controller.deleteUser.route, async (req: Request, res: Response) => {
 });
 
 app.get(Controller.getUsersList.route, autoSuggestSchema, async (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
-  const { loginSubstring, limit } = req.body;
-  const { data, error } = await Controller.getUsersList.service(loginSubstring, limit);
+  const { data, error } = await Controller.getUsersList.service(req.body);
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR);
   }
