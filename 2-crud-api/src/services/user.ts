@@ -1,35 +1,47 @@
 import { NewUserDTO, UserDTO } from "../models";
-import { v4 as uuidv4 } from 'uuid';
+import { UserRepository } from "../data-access/user";
+
 
 const result = (error: any, data: any) => ({ error, data });
-
 export default class UserService {
-  async get(userId: string) {
-    const user = {};
-    return result(null, user);
+  async get(args: { id: string; }) {
+    try {
+      const user = await UserRepository.findById(args.id);
+      return result(null, user);
+    } catch (err) {
+      return result(err, null);
+    }
   }
   async add(user: NewUserDTO) {
-    const id = uuidv4();
-    const newUser = {
-      ...user,
-      id,
-      isDeleted: false,
-    };
-    return result(null, id);
+    try {
+      const id = await UserRepository.add(user);
+      return result(null, id);
+    } catch (err) {
+      return result(err, null);
+    }
   }
-  async delete(userId: string) {
-    return result(null, userId);
+  async delete(args: { id: string; }) {
+    try {
+      await UserRepository.delete(args.id);
+      return result(null, true);
+    } catch (err) {
+      return result(err, false);
+    }
   }
   async patch(user: Omit<UserDTO, 'isDeleted'> ) {
-    return result(null, user);
+    try {
+      const patched = await UserRepository.patch(user);
+      return result(null, patched);
+    } catch (err) {
+      return result(err, null);
+    }
   }
-  async find({ loginSubstring, limit }) {
-    const users = {};
-    const filtered = Object
-      .values(users)
-      .filter(user => user.login.includes(loginSubstring) && !user.isDeleted)
-      .sort((a, b) => a.login.localeCompare(b.login))
-      .slice(0, limit);
-    return result(null, filtered);
+  async find(args: { loginSubstring: string; limit: number; }) {
+    try {
+      const users = await UserRepository.getList(args.loginSubstring, args.limit);
+      return result(null, users);
+    } catch (err) {
+      return result(err, null);
+    }
   }
 }
