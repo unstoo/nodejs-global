@@ -10,7 +10,7 @@ export type UserDTO = {
   login: string;
   password: string;
   age: number;
-  isDeleted: boolean;
+  is_deleted: boolean;
 }
 
 export type NewUserDTO = {
@@ -44,6 +44,18 @@ export const autoSuggestSchema = validator.query(
     limit: Joi.number().integer().required(),
   })
 );
+
+export const getUserSchema = validator.query(
+  Joi.object({
+    id: Joi.string().required(),
+  })
+);
+
+export interface GetUserSchema extends ValidatedRequestSchema {
+  [ContainerTypes.Query]: {
+    id: string;
+  }
+}
 
 export interface AddUserSchema extends ValidatedRequestSchema {
   [ContainerTypes.Body]: {
