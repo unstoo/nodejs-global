@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { NewUserDTO, UserDTO } from "../models";
+import { NewUserDTO, UserDTO } from "../controllers/user";
 import { UserModel } from "../models/user";
 
 
