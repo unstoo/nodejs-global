@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Express, Request, Response } from 'express';
 import { ValidatedRequest } from 'express-joi-validation';
 import {
@@ -14,7 +16,6 @@ import {
 import UserService from './services/user';
 import { pgInit } from './loaders/pgInit';
 
-dotenv.config();
 
 async function start() {
   await pgInit();

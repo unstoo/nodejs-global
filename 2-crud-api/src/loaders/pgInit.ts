@@ -1,8 +1,5 @@
 import fs from 'node:fs';
 import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export const pgInit = async () => {
   if (!process.env.PG || !process.env.PG_INIT_SQL) {
