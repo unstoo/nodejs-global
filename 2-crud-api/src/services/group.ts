@@ -1,13 +1,13 @@
 import { GroupDTO } from "../controllers/group";
-import { GroupModel } from "../models/group";
+import { Group } from "../models/user";
 
 const result = (error: null | any, data: any) => ({ error, data });
 
 export default class GroupService {
   async get({ id }: Pick<GroupDTO, 'id'>) {
     try {
-      const user = await GroupModel.findOne({
-        where: { id },
+      const user = await Group.findOne({
+        where: { group_id: id },
       });
       return result(null, user);
     } catch (err) {
@@ -16,7 +16,7 @@ export default class GroupService {
   }
   async add(group: Omit<GroupDTO, 'id'>) {
     try {
-      const newGroup = await GroupModel.create(group);
+      const newGroup = await Group.create(group);
       return result(null, newGroup);
     } catch (err) {
       return result(err, null);
@@ -24,8 +24,8 @@ export default class GroupService {
   }
   async delete({ id }: Pick<GroupDTO, 'id'>) {
     try {
-      const deleted = await GroupModel.destroy({
-        where: { id }
+      const deleted = await Group.destroy({
+        where: { group_id: id }
       });
       return result(null, deleted);
     } catch (err) {
@@ -34,13 +34,13 @@ export default class GroupService {
   }
   async patch({ id, name, premissions }: GroupDTO ) {
     try {
-      const updated = await GroupModel.update(
+      const updated = await Group.update(
         {
           name,
           premissions,
         },
         {
-          where: { id },
+          where: { group_id: id },
         });
       return result(null, updated);
     } catch (err) {
@@ -49,7 +49,7 @@ export default class GroupService {
   }
   async getAll() {
     try {
-      const groups = await GroupModel.findAll();
+      const groups = await Group.findAll();
       return result(null, groups);
     } catch (err) {
       return result(err, null);

@@ -8,7 +8,7 @@ import { groupRouter } from './controllers/groupRouter';
 
 
 async function start() {
-  await pgInit();
+  // await pgInit();
 
   const app: Express = express();
   const port = process.env.PORT;

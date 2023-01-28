@@ -1,9 +1,10 @@
 CREATE extension IF NOT EXISTS "uuid-ossp";
 
+-- DROP TABLE IF EXISTS user_group;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
-      id uuid primary key DEFAULT uuid_generate_v4(),
+      user_id uuid primary key DEFAULT uuid_generate_v4(),
       login VARCHAR(128) NOT NULL,
       password VARCHAR(128) NOT NULL,
       age INTEGER NOT NULL,

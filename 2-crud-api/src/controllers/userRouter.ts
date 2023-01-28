@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import {
   StatusCodes,
 } from 'http-status-codes';
@@ -8,6 +8,7 @@ import {
   addUserSchema, AddUserSchema,
   patchUserSchema, PatchUserSchema,
   autoSuggestSchema, AutoSuggestSchema,
+  addUserToGroupValidator, AddUserToGroupSchema,
 } from './user';
 
 import { ValidatedRequest } from 'express-joi-validation';
@@ -37,6 +38,10 @@ const userController = {
     route: '/autoSuggest',
     service: userService.find,
   },
+  addUserToGroup: {
+    route: '/addUserToGroup',
+    service: userService.addToGroup,
+  }
 };
 
 userRouter.get(userController.getUser.route, getUserSchema, async (req: ValidatedRequest<GetUserSchema>, res: Response) => {
@@ -74,6 +79,14 @@ userRouter.delete(userController.deleteUser.route, async (req: Request, res: Res
 
 userRouter.get(userController.getUsersList.route, autoSuggestSchema, async (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
   const { data, error } = await userController.getUsersList.service(req.query);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+  }
+  res.status(StatusCodes.OK).json(data);
+});
+
+userRouter.post(userController.addUserToGroup.route, addUserToGroupValidator, async (req: ValidatedRequest<AddUserToGroupSchema>, res: Response) => {
+  const { data, error } = await userController.addUserToGroup.service(req.body);
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
   }

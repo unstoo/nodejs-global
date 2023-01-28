@@ -51,6 +51,14 @@ export const getUserSchema = validator.query(
   })
 );
 
+
+export const addUserToGroupValidator = validator.body(
+  Joi.object({
+    groupId: Joi.string().required(),
+    userIds: Joi.array().items(Joi.string()).min(1).required(),
+  })
+);
+
 export interface GetUserSchema extends ValidatedRequestSchema {
   [ContainerTypes.Query]: {
     id: string;
@@ -78,5 +86,12 @@ export interface AutoSuggestSchema extends ValidatedRequestSchema {
   [ContainerTypes.Query]: {
     loginSubstring: string;
     limit: number;
+  }
+}
+
+export interface AddUserToGroupSchema extends ValidatedRequestSchema {
+  [ContainerTypes.Body]: {
+    groupId: string;
+    userIds: Array<string>;
   }
 }

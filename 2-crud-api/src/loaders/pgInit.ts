@@ -16,9 +16,10 @@ export const pgInit = async () => {
     const sqlGroups = fs.readFileSync(process.env.PG_INIT_GROUPS, 'utf8');
     await sequelize.query(sqlGroups);
     process.stdout.write('Finished initializing groups table.\n');
-    } catch (err) {
-      process.stderr.write('Failed to init DB:\n');
-      process.stderr.write(err + '\n');
-      process.exit(1);
-    }
+    return sequelize;
+  } catch (err) {
+    process.stderr.write('Failed to init DB:\n');
+    process.stderr.write(err + '\n');
+    process.exit(1);
   }
+}

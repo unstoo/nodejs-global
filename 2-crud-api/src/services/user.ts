@@ -1,15 +1,16 @@
 import { Op } from "sequelize";
 import { NewUserDTO, UserDTO } from "../controllers/user";
-import { UserModel } from "../models/user";
+import { User, Group } from "../models/user";
+// import { UserGroupModel } from "../models/user_group";
 
 
 const result = (error: any, data: any) => ({ error, data });
 export default class UserService {
   async get(args: { id: string; }) {
     try {
-      const user = await UserModel.findOne({
+      const user = await User.findOne({
         where: {
-          id: args.id,
+          user_id: args.id,
           is_deleted: false,
         },
       });
@@ -20,7 +21,7 @@ export default class UserService {
   }
   async add(user: NewUserDTO) {
     try {
-      const newUser = await UserModel.create(user);
+      const newUser = await User.create(user);
       return result(null, newUser);
     } catch (err) {
       return result(err, null);
@@ -28,10 +29,10 @@ export default class UserService {
   }
   async delete(args: { id: string; }) {
     try {
-      const updated = await UserModel.update({ is_deleted: true }, {
+      const updated = await User.update({ is_deleted: true }, {
         where: {
           is_deleted: false,
-          id: args.id
+          user_id: args.id
         }
       });
       return result(null, updated);
@@ -41,7 +42,7 @@ export default class UserService {
   }
   async patch(user: Omit<UserDTO, 'is_deleted'> ) {
     try {
-      const updated = await UserModel.update(
+      const updated = await User.update(
         {
           login: user.login,
           password: user.password,
@@ -49,7 +50,7 @@ export default class UserService {
         },
         {
           where: {
-            id: user.id,
+            user_id: user.id,
             is_deleted: false,
           },
         });
@@ -60,7 +61,7 @@ export default class UserService {
   }
   async find(args: { loginSubstring: string; limit: number; }) {
     try {
-      const users = await UserModel.findAll({
+      const users = await User.findAll({
         where: {
           login: {
             [Op.like]: '%' + args.loginSubstring + '%' 
@@ -70,6 +71,34 @@ export default class UserService {
         limit: args.limit,
       });
       return result(null, users);
+    } catch (err) {
+      return result(err, null);
+    }
+  }
+  async addToGroup(args: { groupId: string; userIds: string[]; }) {
+    try {
+      // console.log('added', args);
+      const groups = await Group.findAll();
+      const users = await User.findAll();
+      // @ts-ignore
+      console.log(groups[0].group_id)
+      // @ts-ignore
+      console.log(users[0].user_id)
+      // @ts-ignore
+      const res = await users[0].addGroup(groups[0])
+      console.log(res)
+      // const users = await User.findAll({
+      //   where: 
+      //   {
+      //     id: {
+      //       [Op.in]: args.userIds,
+      //     }
+      //   }
+      // });
+
+      
+
+      return result(null, args);
     } catch (err) {
       return result(err, null);
     }
