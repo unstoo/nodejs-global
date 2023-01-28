@@ -4,6 +4,7 @@ import express, { Express } from 'express';
 
 import { pgInit } from './loaders/pgInit';
 import { userRouter } from './controllers/userRouter';
+import { groupRouter } from './controllers/groupRouter';
 
 
 async function start() {
@@ -13,6 +14,7 @@ async function start() {
   const port = process.env.PORT;
   app.use(express.json());
   app.use(userRouter);
+  app.use(groupRouter);
 
   app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
