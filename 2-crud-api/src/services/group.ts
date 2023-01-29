@@ -1,8 +1,8 @@
 import { GroupDTO } from "../controllers/group";
-import { Group } from "../models/user";
+import { Models } from "../data-access/models";
 
 const result = (error: null | any, data: any) => ({ error, data });
-
+const { Group } = Models;
 export default class GroupService {
   async get({ id }: Pick<GroupDTO, 'id'>) {
     try {

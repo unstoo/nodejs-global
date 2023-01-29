@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express, { Express } from 'express';
 
-import { pgInit } from './loaders/pgInit';
+// import { pgInit } from './loaders/pgInit';
 import { userRouter } from './controllers/userRouter';
 import { groupRouter } from './controllers/groupRouter';
 

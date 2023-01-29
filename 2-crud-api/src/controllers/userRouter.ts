@@ -39,7 +39,7 @@ const userController = {
     service: userService.find,
   },
   addUserToGroup: {
-    route: '/addUserToGroup',
+    route: '/addUsersToGroup',
     service: userService.addToGroup,
   }
 };

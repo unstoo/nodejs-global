@@ -36,7 +36,7 @@ export const patchGroupValidator = validator.body(
   })
 );
 
-export const deleteGroupValidator = validator.query(
+export const deleteGroupValidator = validator.body(
   Joi.object({
     id: Joi.string().required(),
   })
@@ -68,7 +68,7 @@ export interface PatchGroupSchema extends ValidatedRequestSchema {
 }
 
 export interface DeleteGroupSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Query]: {
+  [ContainerTypes.Body]: {
     id: string;
   }
 }

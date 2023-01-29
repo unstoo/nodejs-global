@@ -1,10 +1,11 @@
 import { Op } from "sequelize";
 import { NewUserDTO, UserDTO } from "../controllers/user";
-import { User, Group } from "../models/user";
-// import { UserGroupModel } from "../models/user_group";
+import { Models } from "../data-access/models";
+
+const { User, Group } = Models;
 
 
-const result = (error: any, data: any) => ({ error, data });
+const result = (error: null | any, data: any) => ({ error, data });
 export default class UserService {
   async get(args: { id: string; }) {
     try {
@@ -77,26 +78,18 @@ export default class UserService {
   }
   async addToGroup(args: { groupId: string; userIds: string[]; }) {
     try {
-      // console.log('added', args);
-      const groups = await Group.findAll();
-      const users = await User.findAll();
-      // @ts-ignore
-      console.log(groups[0].group_id)
-      // @ts-ignore
-      console.log(users[0].user_id)
-      // @ts-ignore
-      const res = await users[0].addGroup(groups[0])
-      console.log(res)
-      // const users = await User.findAll({
-      //   where: 
-      //   {
-      //     id: {
-      //       [Op.in]: args.userIds,
-      //     }
-      //   }
-      // });
-
-      
+      const group = await Group.findByPk(args.groupId);
+      const users = await User.findAll({
+        where: 
+        {
+          user_id: {
+            [Op.in]: args.userIds,
+          },
+          is_deleted: false,
+        }
+      });
+      //@ts-ignore
+      await group.addUser(users)     
 
       return result(null, args);
     } catch (err) {
