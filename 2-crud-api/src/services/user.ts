@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { NewUserDTO, UserDTO } from "../controllers/user";
-import { Models } from "../data-access/models";
+import { Models, sequelize } from "../data-access/models";
 
 const { User, Group } = Models;
 
@@ -78,19 +78,20 @@ export default class UserService {
   }
   async addToGroup(args: { groupId: string; userIds: string[]; }) {
     try {
-      const group = await Group.findByPk(args.groupId);
-      const users = await User.findAll({
-        where: 
-        {
-          user_id: {
-            [Op.in]: args.userIds,
-          },
-          is_deleted: false,
-        }
+      await sequelize.transaction(async (t) => {        
+        const group = await Group.findByPk(args.groupId, { transaction: t });
+        const users = await User.findAll({
+          where: 
+          {
+            user_id: {
+              [Op.in]: args.userIds,
+            },
+            is_deleted: false,
+          }
+        });
+        //@ts-ignore
+        await group.addUser(users, { transaction: t });  
       });
-      //@ts-ignore
-      await group.addUser(users)     
-
       return result(null, args);
     } catch (err) {
       return result(err, null);
