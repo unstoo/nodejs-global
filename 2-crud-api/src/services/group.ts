@@ -32,12 +32,12 @@ export default class GroupService {
       return result(err, null);
     }
   }
-  async patch({ id, name, premissions }: GroupDTO ) {
+  async patch({ id, name, permissions }: GroupDTO) {
     try {
       const updated = await Group.update(
         {
           name,
-          premissions,
+          permissions,
         },
         {
           where: { group_id: id },

@@ -3,11 +3,11 @@ DROP TABLE IF EXISTS groups;
 CREATE TABLE groups (
   group_id uuid primary key DEFAULT uuid_generate_v4(),
   name VARCHAR(128) NOT NULL,
-  premissions text [] NOT NULL
+  permissions text [] NOT NULL
 );
 
 INSERT INTO
-  groups (name, premissions)
+  groups (name, permissions)
 VALUES
   (
     'admin_group',

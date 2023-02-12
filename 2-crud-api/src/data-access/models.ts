@@ -29,8 +29,8 @@ const UserGroupModel = UserGroup(sequelize);
       ],
     );
     const grps = await GroupModel.bulkCreate([
-      { name: 'admin_grp', premissions: ['READ', 'WRITE', 'DELETE'] },
-      { name: 'user_grp', premissions: ['READ', 'WRITE'] },
+      { name: 'admin_grp', permissions: ['READ', 'WRITE', 'DELETE'] },
+      { name: 'user_grp', permissions: ['READ', 'WRITE'] },
     ]);
   } catch (error) {
     process.stderr.write(error + '\n');

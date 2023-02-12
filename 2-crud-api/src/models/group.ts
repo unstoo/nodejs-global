@@ -4,7 +4,7 @@ export const Group = (sequelize: any) => {
   interface GroupAttributes {
     group_id?: number;
     name: string;
-    premissions: string[];
+    permissions: string[];
   }
 
   type GroupCreationAttributes = Optional<GroupAttributes, 'group_id'>;
@@ -21,7 +21,7 @@ export const Group = (sequelize: any) => {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      premissions: {
+      permissions: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,
         defaultValue: [],

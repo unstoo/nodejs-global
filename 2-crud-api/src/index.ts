@@ -13,8 +13,8 @@ async function start() {
   const app: Express = express();
   const port = process.env.PORT;
   app.use(express.json());
-  app.use(userRouter);
-  app.use(groupRouter);
+  app.use('/user/', userRouter);
+  app.use('/group/', groupRouter);
 
   app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
