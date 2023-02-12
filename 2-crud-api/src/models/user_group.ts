@@ -1,0 +1,1 @@
+export const UserGroup = (sequelize: any) => sequelize.define('UserGroup', {}, { timestamps: false });
