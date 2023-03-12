@@ -5,7 +5,33 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 // import { pgInit } from './loaders/pgInit';
 import { userRouter } from './controllers/userRouter';
 import { groupRouter } from './controllers/groupRouter';
+import { JWTService } from './services/jwt';
 import { logger } from './logger';
+import { loginRouter } from './controllers/loginRouter';
+
+const jwtService = new JWTService();
+
+export const checkAuthorization = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authorization = req.headers.authorization ?? '';
+    const [label, maybeToken] = authorization.split(' ');
+    if (label !== 'Bearer') {
+      res.status(401).send('Unauthorized');
+      throw new Error();
+    }
+
+
+    const verified = jwtService.verify(maybeToken);
+
+    if (verified === null) {
+      res.status(403).send('Forbidden');
+      throw new Error();
+    }
+
+    next();
+  } catch (e) {
+  }
+};
 
 async function start() {
   // await pgInit();
@@ -13,7 +39,6 @@ async function start() {
   const app: Express = express();
   const port = process.env.PORT;
   app.use(express.json());
-
   app.use((req: Request, res: Response, next: NextFunction) => {
     const { method, url, query, params, body } = req;
     logger.info({ 
@@ -25,7 +50,9 @@ async function start() {
     });
     next();
   });
+  app.use('/', loginRouter);
 
+  app.use(checkAuthorization);
   app.use('/user/', userRouter);
   app.use('/group/', groupRouter);
 

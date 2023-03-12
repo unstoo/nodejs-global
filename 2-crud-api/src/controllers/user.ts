@@ -51,13 +51,6 @@ export const getUserSchema = validator.query(
   })
 );
 
-export const loginUserSchema = validator.query(
-  Joi.object({
-    login: Joi.string().required(),
-    password: Joi.string().required().alphanum().pattern(new RegExp('[a-zA-Z]')).pattern(new RegExp('[0-9]')),
-  })
-);
-
 
 export const addUserToGroupValidator = validator.body(
   Joi.object({
@@ -100,12 +93,5 @@ export interface AddUserToGroupSchema extends ValidatedRequestSchema {
   [ContainerTypes.Body]: {
     groupId: string;
     userIds: Array<string>;
-  }
-}
-
-export interface LoginUserSchema extends ValidatedRequestSchema {
-  [ContainerTypes.Query]: {
-    login: string;
-    password: string;
   }
 }

@@ -56,4 +56,13 @@ export class JWTService {
       return result(403, null);
     }
   }
+  verify(token: string) {
+    try {
+      const verified = verify(token, secret) as JwtPayload;
+      if (hasExpired(verified.exp ?? 0)) throw new Error();
+      return { login: verified.login };
+    } catch (e) {
+      return null;
+    }
+  }
 }

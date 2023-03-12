@@ -1,10 +1,8 @@
 import { Op } from "sequelize";
 import { NewUserDTO, UserDTO } from "../controllers/user";
 import { Models, sequelize } from "../data-access/models";
-import { JWTService } from './jwt';
 
 const { User, Group } = Models;
-const jwtService = new JWTService();
 
 
 const result = (error: null | any, data: any) => ({ error, data });
@@ -95,20 +93,6 @@ export default class UserService {
         await group.addUser(users, { transaction: t });  
       });
       return result(null, args);
-    } catch (err) {
-      return result(err, null);
-    }
-  }
-  async login(args: { login: string; password: string; }) {
-    try {
-      const user = await User.findOne({
-        where: {
-          login: args.login,
-          is_deleted: false,
-        },
-      });
-      const token = jwtService.get({login: args.login});
-      return result(null, token);
     } catch (err) {
       return result(err, null);
     }
