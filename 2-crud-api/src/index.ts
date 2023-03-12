@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express, { Express, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 
 // import { pgInit } from './loaders/pgInit';
 import { userRouter } from './controllers/userRouter';
@@ -38,6 +39,7 @@ async function start() {
 
   const app: Express = express();
   const port = process.env.PORT;
+  app.use(cors());
   app.use(express.json());
   app.use((req: Request, res: Response, next: NextFunction) => {
     const { method, url, query, params, body } = req;
