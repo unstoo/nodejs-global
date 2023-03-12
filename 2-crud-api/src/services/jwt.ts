@@ -1,30 +1,34 @@
 
-import { verify, sign } from 'jsonwebtoken';
+import { NextFunction, Request, Response } from 'express';
+import { verify, sign, JwtPayload } from 'jsonwebtoken';
+
+const secret = String(process.env.JWT_SECRET);
 
 const hasExpired = (stamp: number) => {
   const now = Date.now();
   return now > stamp * 1000;
 };
 
-const validateRequest = (req) => {
-  let verified;
+export const validateRequest = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const [label, maybeToken] = req.headers.authorization.split(' ');
+    const { authorization } = req.headers;
+    if (!authorization) throw new Error();
+    const [label, maybeToken] = authorization.split(' ');
     if (label !== 'Bearer') throw new Error();
-    verified = verify(maybeToken, process.env.JWT_SECRET);
-    if (hasExpired(verified.exp)) throw new Error();
+    const verified = verify(maybeToken, secret) as JwtPayload;
+    if (hasExpired(verified.exp ?? 0)) throw new Error();
   } catch (e) {
-    throw new UnauthorizedException('Wrong access token');
+    throw new Error('Wrong access token');
   }
-  return true;
+  return next();
 };
 
-const makeTokens = (login: string) => {
-  const accessToken = sign({ login }, process.env.JWT_SECRET, {
+const makeTokens = (login: string, secret: string) => {
+  const accessToken = sign({ login }, secret, {
     expiresIn: '24h',
   });
 
-  const refreshToken = sign({ login }, process.env.JWT_SECRET, {
+  const refreshToken = sign({ login }, secret, {
     expiresIn: '14d',
   });
 
@@ -36,22 +40,20 @@ const makeTokens = (login: string) => {
 
 const result = (error: null | any, data: any) => ({ error, data });
 
-export default class JWTService {
+export class JWTService {
   async get(args: { login: string; }) {
-    return makeTokens(args.login);
+    return makeTokens(args.login, secret);
   }
   async refresh(args: { refreshToken: string; }) {
-    let verified;
     try {
-      verified = verify(args.refreshToken, process.env.JWT_SECRET);
-      const now = Date.now();
-      const expire = Number(verified.exp) * 1000;
-      if (now > expire)
-        return result(403, null);
-      } catch (e) {
+      const verified = verify(args.refreshToken, secret) as JwtPayload;
+      if (hasExpired(verified.exp ?? 0)) {
         return result(403, null);
       }
 
-    return result(403, makeTokens(verified.login));
+      return result(null, makeTokens(verified.login, secret));
+    } catch (e) {
+      return result(403, null);
+    }
   }
 }

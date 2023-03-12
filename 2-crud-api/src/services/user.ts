@@ -4,6 +4,7 @@ import { Models, sequelize } from "../data-access/models";
 import { JWTService } from './jwt';
 
 const { User, Group } = Models;
+const jwtService = new JWTService();
 
 
 const result = (error: null | any, data: any) => ({ error, data });
@@ -106,7 +107,7 @@ export default class UserService {
           is_deleted: false,
         },
       });
-      const token = JWTService.get(user.login);
+      const token = jwtService.get({login: args.login});
       return result(null, token);
     } catch (err) {
       return result(err, null);
