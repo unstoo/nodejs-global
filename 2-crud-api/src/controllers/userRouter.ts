@@ -8,7 +8,7 @@ import {
   addUserSchema, AddUserSchema,
   patchUserSchema, PatchUserSchema,
   autoSuggestSchema, AutoSuggestSchema,
-  addUserToGroupValidator, AddUserToGroupSchema,
+  addUserToGroupValidator, AddUserToGroupSchema, loginUserSchema, LoginUserSchema,
 } from './user';
 
 import { ValidatedRequest } from 'express-joi-validation';
@@ -41,7 +41,11 @@ const userController = {
   addUserToGroup: {
     route: '/addUsersToGroup',
     service: userService.addToGroup,
-  }
+  },
+  login: {
+    route: '/login',
+    service: userService.login
+  },
 };
 
 userRouter.get(userController.getUser.route, getUserSchema, async (req: ValidatedRequest<GetUserSchema>, res: Response) => {
@@ -87,6 +91,14 @@ userRouter.get(userController.getUsersList.route, autoSuggestSchema, async (req:
 
 userRouter.post(userController.addUserToGroup.route, addUserToGroupValidator, async (req: ValidatedRequest<AddUserToGroupSchema>, res: Response) => {
   const { data, error } = await userController.addUserToGroup.service(req.body);
+  if (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+  }
+  res.status(StatusCodes.OK).json(data);
+});
+
+userRouter.get(userController.login.route, loginUserSchema, async (req: ValidatedRequest<LoginUserSchema>, res: Response) => {
+  const { data, error } = await userController.login.service(req.query);
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
