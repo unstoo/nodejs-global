@@ -24,7 +24,7 @@ describe('Users (e2e)', () => {
   });
 
   describe('GET', () => {
-    it('should auto suggest user list given hint and result limit', async () => {
+    it('should auto suggest users list given hint and result limit', async () => {
       const response = await unauthorizedRequest
         .get(userRoutes.suggestUsers('j', 5))
         .set(commonHeaders);
@@ -61,4 +61,16 @@ describe('Users (e2e)', () => {
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
     });
   });
+
+  // should patch user details
+  // should delete user
+
+  // GROUP
+  // should create new group
+  // should get group by id
+  // should patch group details
+  // should get group list
+
+  // e2e
+  // should create multiple users; should create group; should add the the users to the group; 
 });
