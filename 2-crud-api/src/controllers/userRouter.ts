@@ -41,7 +41,7 @@ const userController = {
   addUserToGroup: {
     route: '/addUsersToGroup',
     service: userService.addToGroup,
-  }
+  },
 };
 
 userRouter.get(userController.getUser.route, getUserSchema, async (req: ValidatedRequest<GetUserSchema>, res: Response) => {

@@ -24,8 +24,8 @@ const UserGroupModel = UserGroup(sequelize);
 
     const users = await UserModel.bulkCreate(
       [
-        { login: 'john', password: 'security', age: 25 },
-        { login: 'josh', password: 'safety', age: 32 },
+        { login: 'john', password: 'security55', age: 25 },
+        { login: 'josh', password: 'safety33', age: 32 },
       ],
     );
     const grps = await GroupModel.bulkCreate([

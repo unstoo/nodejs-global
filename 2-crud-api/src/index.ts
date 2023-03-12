@@ -1,19 +1,24 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import express, { Express, Request, Response, NextFunction } from 'express';
+import cors from 'cors';
 
 // import { pgInit } from './loaders/pgInit';
 import { userRouter } from './controllers/userRouter';
 import { groupRouter } from './controllers/groupRouter';
 import { logger } from './logger';
+import { loginRouter } from './controllers/loginRouter';
+import { checkAuthorization } from './middlewares/authorization';
+
+
 
 async function start() {
   // await pgInit();
 
   const app: Express = express();
   const port = process.env.PORT;
+  app.use(cors());
   app.use(express.json());
-
   app.use((req: Request, res: Response, next: NextFunction) => {
     const { method, url, query, params, body } = req;
     logger.info({ 
@@ -25,7 +30,9 @@ async function start() {
     });
     next();
   });
+  app.use('/', loginRouter);
 
+  app.use(checkAuthorization);
   app.use('/user/', userRouter);
   app.use('/group/', groupRouter);
 
