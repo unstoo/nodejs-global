@@ -30,7 +30,7 @@ async function start() {
     });
     next();
   });
-  app.use('/', loginRouter);
+  app.use('/auth/', loginRouter);
 
   app.use(checkAuthorization);
   app.use('/user/', userRouter);
