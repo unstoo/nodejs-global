@@ -6,33 +6,11 @@ import cors from 'cors';
 // import { pgInit } from './loaders/pgInit';
 import { userRouter } from './controllers/userRouter';
 import { groupRouter } from './controllers/groupRouter';
-import { JWTService } from './services/jwt';
 import { logger } from './logger';
 import { loginRouter } from './controllers/loginRouter';
-
-const jwtService = new JWTService();
-
-export const checkAuthorization = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const authorization = req.headers.authorization ?? '';
-    const [label, maybeToken] = authorization.split(' ');
-    if (label !== 'Bearer') {
-      res.status(401).send('Unauthorized');
-      throw new Error();
-    }
+import { checkAuthorization } from './middlewares/authorization';
 
 
-    const verified = jwtService.verify(maybeToken);
-
-    if (verified === null) {
-      res.status(403).send('Forbidden');
-      throw new Error();
-    }
-
-    next();
-  } catch (e) {
-  }
-};
 
 async function start() {
   // await pgInit();
