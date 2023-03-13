@@ -11,19 +11,27 @@ const createUserDto = {
   age: 55,
 };
 
-describe('Users (e2e)', () => {
+const patchUserDto = {
+  ...createUserDto,
+  age: 100
+};
+
+const nonExistentUuid = 'fa3ef97d-0000-aaaa-0000-ef069ba78cd0';
+
+describe('/user (e2e)', () => {
   const unauthorizedRequest = request;
   const commonHeaders = { 
     Accept: 'application/json',
     Authorization: '',
    };
+  let createdUserId = '';
 
   beforeAll(async () => {
     const result = await getTokenAndUserId(unauthorizedRequest);
     commonHeaders.Authorization = result.token;
   });
 
-  describe('GET', () => {
+  describe('User Entity', () => {
     it('should auto suggest users list given hint and result limit', async () => {
       const response = await unauthorizedRequest
         .get(userRoutes.suggestUsers('j', 5))
@@ -32,8 +40,7 @@ describe('Users (e2e)', () => {
       expect(response.body).toBeInstanceOf(Array);
     });
 
-    it('should correctly get user by id', async () => {
-      console.log(commonHeaders)
+    it('should correctly create user', async () => {
       const creationResponse = await unauthorizedRequest
         .post(userRoutes.addUser)
         .set(commonHeaders)
@@ -41,36 +48,57 @@ describe('Users (e2e)', () => {
 
         
       const { user_id } = creationResponse.body;
+      createdUserId = user_id;
 
       expect(creationResponse.statusCode).toBe(StatusCodes.CREATED);
+    });
 
+    it('should correctly get user by id', async () => {
       const searchResponse = await unauthorizedRequest
-        .get(userRoutes.getUser(user_id))
+        .get(userRoutes.getUser(createdUserId))
         .set(commonHeaders);
 
       expect(searchResponse.statusCode).toBe(StatusCodes.OK);
       expect(searchResponse.body).toBeInstanceOf(Object);
+    });
 
+    it('should correctly handle get with absent uuid', async () => {
+      const searchResponse = await unauthorizedRequest
+        .get(userRoutes.getUser(''))
+        .set(commonHeaders);
+
+      expect(searchResponse.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
+    it('should correctly handle get with non-existing uuid', async () => {
+      const searchResponse = await unauthorizedRequest
+        .get(userRoutes.getUser(nonExistentUuid))
+        .set(commonHeaders);
+
+      expect(searchResponse.statusCode).toBe(StatusCodes.OK);
+      expect(searchResponse.body).toBe(null);
+    });
+
+    it('should correctly patch user', async () => {
+      const patchResponse = await unauthorizedRequest
+        .patch(userRoutes.patchUser)
+        .set(commonHeaders)
+        .send({
+          id: createdUserId,
+          ...patchUserDto,
+        });
+
+      expect(patchResponse.statusCode).toBe(StatusCodes.OK);
+    });
+
+    it('should correctly delete user', async () => {
       const cleanupResponse = await unauthorizedRequest
         .delete(userRoutes.deleteUser)
         .set(commonHeaders)
         .send({
-          id: user_id
+          id: createdUserId
         });
 
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
     });
   });
-
-  // should patch user details
-  // should delete user
-
-  // GROUP
-  // should create new group
-  // should get group by id
-  // should patch group details
-  // should get group list
-
-  // e2e
-  // should create multiple users; should create group; should add the the users to the group; 
 });
