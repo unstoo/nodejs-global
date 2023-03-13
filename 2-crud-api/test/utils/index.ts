@@ -1,3 +1,3 @@
-import getTokenAndUserId from './getTokenAndUserId';
+import getAuthToken from './getToken';
 
-export { getTokenAndUserId };
+export { getAuthToken };

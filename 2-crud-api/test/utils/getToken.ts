@@ -1,13 +1,12 @@
 import { authRoutes } from '../endpoints';
+const mockUserLogin = 'john';
+const mockUserPassword = 'security55';
 
-const getTokenAndUserId = async (request: any) => {
-
-  // get token
-  const mockUserLogin = 'john';
+const getAuthToken = async (request: any) => {
   const {
     body: { accessToken },
   } = await request
-      .get(authRoutes.login + `?login=${mockUserLogin}&password=security55`)
+      .get(authRoutes.login + `?login=${mockUserLogin}&password=${mockUserPassword}`)
       .set('Accept', 'application/json');
 
   if (accessToken === undefined) {
@@ -16,7 +15,7 @@ const getTokenAndUserId = async (request: any) => {
 
   const token = `Bearer ${accessToken}`;
 
-  return { token, mockUserLogin };
+  return { token };
 };
 
-export default getTokenAndUserId;
+export default getAuthToken;

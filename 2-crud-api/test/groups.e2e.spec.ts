@@ -3,59 +3,59 @@ import { request } from './lib';
 import {
   getAuthToken,
 } from './utils';
-import { userRoutes } from './endpoints';
+import { groupRoutes } from './endpoints';
 
-const createUserDto = {
-  login: 'login',
-  password: 'testpwd5555',
-  age: 55,
+const createGroupDto = {
+  name: 'empty_group',
+  permissions: [],
 };
 
-const patchUserDto = {
-  ...createUserDto,
-  age: 100
-};
+const patchGroupDto = {
+  ...createGroupDto,
+  permissions: ['SHARE'],
+}
 
 const nonExistentUuid = 'fa3ef97d-0000-aaaa-0000-ef069ba78cd0';
 
-describe('/user (e2e)', () => {
+
+describe('/group (e2e)', () => {
   const unauthorizedRequest = request;
   const commonHeaders = { 
     Accept: 'application/json',
     Authorization: '',
    };
-  let createdUserId = '';
+  let createdGroupId = '';
 
   beforeAll(async () => {
     const result = await getAuthToken(unauthorizedRequest);
     commonHeaders.Authorization = result.token;
   });
 
-  describe('User Entity', () => {
-    it('should auto suggest users list given hint and result limit', async () => {
+  describe('Group Entity', () => {
+    it('should get group list', async () => {
       const response = await unauthorizedRequest
-        .get(userRoutes.suggestUsers('j', 5))
+        .get(groupRoutes.getGroupList)
         .set(commonHeaders);
+
       expect(response.status).toBe(StatusCodes.OK);
       expect(response.body).toBeInstanceOf(Array);
     });
 
-    it('should correctly create user', async () => {
+    it('should correctly create group', async () => {
       const creationResponse = await unauthorizedRequest
-        .post(userRoutes.addUser)
+        .post(groupRoutes.addGroup)
         .set(commonHeaders)
-        .send(createUserDto);
+        .send(createGroupDto);
 
-        
-      const { user_id } = creationResponse.body;
-      createdUserId = user_id;
+      const { group_id } = creationResponse.body;
+      createdGroupId = group_id;
 
       expect(creationResponse.statusCode).toBe(StatusCodes.CREATED);
     });
 
-    it('should correctly get user by id', async () => {
+    it('should correctly get group by id', async () => {
       const searchResponse = await unauthorizedRequest
-        .get(userRoutes.getUser(createdUserId))
+        .get(groupRoutes.getGroup(createdGroupId))
         .set(commonHeaders);
 
       expect(searchResponse.statusCode).toBe(StatusCodes.OK);
@@ -64,41 +64,41 @@ describe('/user (e2e)', () => {
 
     it('should correctly handle get with absent uuid', async () => {
       const searchResponse = await unauthorizedRequest
-        .get(userRoutes.getUser(''))
+        .get(groupRoutes.getGroup(''))
         .set(commonHeaders);
 
       expect(searchResponse.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
     it('should correctly handle get with non-existing uuid', async () => {
       const searchResponse = await unauthorizedRequest
-        .get(userRoutes.getUser(nonExistentUuid))
+        .get(groupRoutes.getGroup(nonExistentUuid))
         .set(commonHeaders);
 
       expect(searchResponse.statusCode).toBe(StatusCodes.OK);
       expect(searchResponse.body).toBe(null);
     });
 
-    it('should correctly patch user', async () => {
+    it('should correctly patch group', async () => {
       const patchResponse = await unauthorizedRequest
-        .patch(userRoutes.patchUser)
+        .patch(groupRoutes.patchGroup)
         .set(commonHeaders)
         .send({
-          id: createdUserId,
-          ...patchUserDto,
+          id: createdGroupId,
+          ...patchGroupDto,
         });
 
       expect(patchResponse.statusCode).toBe(StatusCodes.OK);
     });
 
-    it('should correctly delete user', async () => {
+    it('should correctly delete group', async () => {
       const cleanupResponse = await unauthorizedRequest
-        .delete(userRoutes.deleteUser)
+        .delete(groupRoutes.deleteGroup)
         .set(commonHeaders)
         .send({
-          id: createdUserId
+          id: createdGroupId
         });
 
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
-    });
+    });    
   });
 });
