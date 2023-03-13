@@ -54,7 +54,7 @@ groupRouter.post(groupController.addGroup.route, addGroupValidator, async (req: 
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
-  res.status(StatusCodes.OK).json(data);
+  res.status(StatusCodes.CREATED).json(data);
 });
 
 groupRouter.patch(groupController.patchGroup.route, patchGroupValidator, async (req: ValidatedRequest<PatchGroupSchema>, res: Response) => {
@@ -70,7 +70,7 @@ groupRouter.delete(groupController.deleteGroup.route, deleteGroupValidator, asyn
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
-  res.status(StatusCodes.OK).json(data);
+  res.status(StatusCodes.NO_CONTENT).json(data);
 });
 
 groupRouter.get(groupController.getGroupList.route, getGroupListValidator, async (req: ValidatedRequest<GetGroupListSchema>, res: Response) => {

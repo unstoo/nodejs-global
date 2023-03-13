@@ -41,7 +41,7 @@ const userController = {
   addUserToGroup: {
     route: '/addUsersToGroup',
     service: userService.addToGroup,
-  }
+  },
 };
 
 userRouter.get(userController.getUser.route, getUserSchema, async (req: ValidatedRequest<GetUserSchema>, res: Response) => {
@@ -58,7 +58,7 @@ userRouter.post(userController.addUser.route, addUserSchema, async (req: Validat
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
-  res.status(StatusCodes.OK).json(data);
+  res.status(StatusCodes.CREATED).json(data);
 });
 
 userRouter.patch(userController.patchUser.route, patchUserSchema, async (req: ValidatedRequest<PatchUserSchema>, res: Response) => {
@@ -74,7 +74,7 @@ userRouter.delete(userController.deleteUser.route, async (req: Request, res: Res
   if (error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
   }
-  res.status(StatusCodes.OK).json(data);
+  res.status(StatusCodes.NO_CONTENT).json(data);
 });
 
 userRouter.get(userController.getUsersList.route, autoSuggestSchema, async (req: ValidatedRequest<AutoSuggestSchema>, res: Response) => {
