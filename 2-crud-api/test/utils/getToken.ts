@@ -1,6 +1,6 @@
 import { authRoutes } from '../endpoints';
-const mockUserLogin = 'john';
-const mockUserPassword = 'security55';
+const mockUserLogin = process.env.TEST_LOGIN;
+const mockUserPassword = process.env.TEST_PASSWORD;
 
 const getAuthToken = async (request: any) => {
   const {

@@ -1,10 +1,11 @@
 import { Sequelize, } from 'sequelize';
 
-if (!process.env.PG) {
+if (!process.env.PG || !process.env.TEST_LOGIN || !process.env.TEST_PASSWORD) {
   process.stderr.write('Missing PG config details.\n');
   process.exit(1);
 }
-
+const testLogin = process.env.TEST_LOGIN;
+const testPassword = process.env.TEST_PASSWORD;
 export const sequelize = new Sequelize(process.env.PG);
 
 import { User } from '../models/user';
@@ -24,7 +25,7 @@ const UserGroupModel = UserGroup(sequelize);
 
     const users = await UserModel.bulkCreate(
       [
-        { login: 'john', password: 'security55', age: 25 },
+        { login: testLogin, password: testPassword, age: 25 },
         { login: 'josh', password: 'safety33', age: 32 },
       ],
     );
